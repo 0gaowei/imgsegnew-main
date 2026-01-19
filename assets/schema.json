@@ -1,0 +1,1898 @@
+{
+    "version": "1.0.0",
+    "componentsMap": [
+        {
+            "package": "@alilc/antd-lowcode-materials",
+            "version": "1.2.2",
+            "exportName": "Badge",
+            "main": "",
+            "destructuring": true,
+            "componentName": "Badge"
+        },
+        {
+            "package": "@alilc/antd-lowcode-materials",
+            "version": "1.2.2",
+            "exportName": "Menu",
+            "main": "",
+            "destructuring": true,
+            "componentName": "Menu"
+        },
+        {
+            "package": "@alilc/antd-lowcode-materials",
+            "version": "1.2.2",
+            "exportName": "Image",
+            "main": "",
+            "destructuring": true,
+            "componentName": "Image"
+        },
+        {
+            "package": "@alilc/antd-lowcode-materials",
+            "version": "1.2.2",
+            "exportName": "Col",
+            "main": "",
+            "destructuring": true,
+            "componentName": "Col"
+        },
+        {
+            "package": "@alilc/antd-lowcode-materials",
+            "version": "1.2.2",
+            "exportName": "Typography",
+            "main": "",
+            "destructuring": true,
+            "subName": "Text",
+            "componentName": "Typography.Text"
+        },
+        {
+            "devMode": "lowCode",
+            "componentName": "Page"
+        }
+    ],
+    "componentsTree": [
+        {
+            "componentName": "Page",
+            "id": "node_dockcviv8fo1",
+            "props": {
+                "ref": "outerView",
+                "style": {
+                    "height": "1224px",
+                    "position": "relative",
+                    "width": "1920px"
+                }
+            },
+            "fileName": "/",
+            "dataSource": {
+                "list": [
+                    {
+                        "type": "fetch",
+                        "isInit": true,
+                        "options": {
+                            "params": {},
+                            "method": "GET",
+                            "isCors": true,
+                            "timeout": 5000,
+                            "headers": {},
+                            "uri": "mock/info.json"
+                        },
+                        "id": "info",
+                        "shouldFetch": {
+                            "type": "JSFunction",
+                            "value": "function() { \n  console.log('should fetch.....');\n  return true; \n}"
+                        }
+                    }
+                ]
+            },
+            "state": {
+                "text": {
+                    "type": "JSExpression",
+                    "value": "\"outer\""
+                },
+                "isShowDialog": {
+                    "type": "JSExpression",
+                    "value": "false"
+                }
+            },
+            "css": ".bgecol36b9a .ant-badge-status-text { color: rgba(236,237,237,1) !important; font-size: 14px !important; margin-left: 0 !important;  position: absolute; left: 50%; top: 50%; transform: translate(-55%, -55%); }\n.ant-menu-inline { border-right: none !important; }\n.ant-menu-horizontal { border-bottom: none !important; }\n.ant-image { width: 100% !important; height: 100% !important; }",
+            "lifeCycles": {
+                "componentDidMount": {
+                    "type": "JSFunction",
+                    "value": "function componentDidMount() {\n  console.log('did mount');\n}"
+                },
+                "componentWillUnmount": {
+                    "type": "JSFunction",
+                    "value": "function componentWillUnmount() {\n  console.log('will unmount');\n}"
+                }
+            },
+            "methods": {
+                "testFunc": {
+                    "type": "JSFunction",
+                    "value": "function testFunc() {\n  console.log('test func');\n}"
+                },
+                "onClick": {
+                    "type": "JSFunction",
+                    "value": "function onClick() {\n  this.setState({\n  isShowDialog: true\n  });\n}"
+                },
+                "closeDialog": {
+                    "type": "JSFunction",
+                    "value": "function closeDialog() {\n  this.setState({\n  isShowDialog: false\n  });\n}"
+                }
+            },
+            "originCode": "class LowcodeComponent extends Component {\n  state = {\n    \"text\": \"outer\",\n    \"isShowDialog\": false\n  }\n  testFunc() {\n    console.log('test func');\n  }\n  onClick() {\n    this.setState({\n      isShowDialog: true\n    });\n  }\n  closeDialog() {\n    this.setState({\n      isShowDialog: false\n    });\n  }\n}",
+            "hidden": false,
+            "title": "",
+            "isLocked": false,
+            "condition": true,
+            "conditionGroup": "",
+            "children": [
+                {
+                    "componentName": "Badge",
+                    "id": "col36b9a",
+                    "props": {
+                        "color": "none",
+                        "dot": false,
+                        "offset": [],
+                        "overflowCount": 0,
+                        "showZero": false,
+                        "status": "warning",
+                        "title": "",
+                        "text": "0",
+                        "style": {
+                            "minWidth": "fit-content",
+                            "whiteSpace": "nowrap",
+                            "width": "1919px",
+                            "height": "97px",
+                            "fontSize": "14px",
+                            "borderRadius": "39px",
+                            "backgroundColor": "rgb(236, 237, 237)",
+                            "color": "rgba(236,237,237,1)",
+                            "textAlign": "left",
+                            "position": "absolute",
+                            "left": 0,
+                            "top": "1124px",
+                            "lineHeight": "78px !important"
+                        },
+                        "ref": "refcol36b9a",
+                        "className": "bgecol36b9a"
+                    },
+                    "hidden": false,
+                    "title": "",
+                    "isLocked": false,
+                    "condition": true,
+                    "conditionGroup": ""
+                },
+                {
+                    "componentName": "Menu",
+                    "id": "colbfd9c",
+                    "props": {
+                        "__component_name": "Menu",
+                        "defaultOpenKeys": [],
+                        "defaultSelectedKeys": [],
+                        "forceSubMenuRender": false,
+                        "inlineCollapsed": false,
+                        "inlineIndent": 0,
+                        "mode": "vertical",
+                        "multiple": false,
+                        "openKeys": [],
+                        "selectabl": false,
+                        "selectable": true,
+                        "subMenuCloseDelay": 0,
+                        "subMenuOpenDelay": 0,
+                        "theme": "light",
+                        "triggerSubMenuAction": "hover",
+                        "items": [
+                            {
+                                "key": "itemk-0",
+                                "label": ">Contact Us"
+                            },
+                            {
+                                "key": "itemk-1",
+                                "label": ">Download"
+                            },
+                            {
+                                "key": "itemk-2",
+                                "label": ">Features"
+                            },
+                            {
+                                "key": "itemk-3",
+                                "label": ">Media"
+                            },
+                            {
+                                "key": "itemk-4",
+                                "label": ">Developers"
+                            },
+                            {
+                                "key": "itemk-5",
+                                "label": ">Mirrors"
+                            },
+                            {
+                                "key": "itemk-6",
+                                "label": ">Code of Conduct"
+                            },
+                            {
+                                "key": "itemk-7",
+                                "label": ">Privacy Policy"
+                            },
+                            {
+                                "key": "itemk-8",
+                                "label": ">Help"
+                            }
+                        ],
+                        "selectedKeys": [
+                            "itemk-0"
+                        ],
+                        "style": {
+                            "position": "absolute",
+                            "left": "407px",
+                            "top": "173px",
+                            "borderRadius": "2px",
+                            "width": "257px",
+                            "height": "371px",
+                            "backgroundColor": "rgb(249, 250, 251)",
+                            "color": "rgba(132,132,132,1)"
+                        },
+                        "ref": "refcolbfd9c"
+                    },
+                    "hidden": false,
+                    "title": "",
+                    "isLocked": false,
+                    "condition": true,
+                    "conditionGroup": ""
+                },
+                {
+                    "componentName": "Col",
+                    "id": "colf97fc",
+                    "props": {
+                        "__component_name": "Col",
+                        "order": 0,
+                        "style": {
+                            "position": "absolute",
+                            "left": "414px",
+                            "top": "547px",
+                            "width": "180px",
+                            "height": "68px",
+                            "color": "rgba(211,214,205,1)"
+                        },
+                        "ref": "refcolf97fc"
+                    },
+                    "hidden": false,
+                    "title": "",
+                    "isLocked": false,
+                    "condition": true,
+                    "conditionGroup": "",
+                    "children": [
+                        {
+                            "componentName": "Image",
+                            "id": "node_oclnvbrvkmk5",
+                            "props": {
+                                "src": "http://163.53.168.57:9000/lowcode/1707251675134468097/未命名-1749897741432.png",
+                                "__component_name": "Image",
+                                "style": {
+                                    "vertical-align": "top"
+                                },
+                                "alt": "",
+                                "preview": false,
+                                "fallback": ""
+                            },
+                            "hidden": false,
+                            "title": "",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        }
+                    ]
+                },
+                {
+                    "componentName": "Col",
+                    "id": "col752cf",
+                    "props": {
+                        "__component_name": "Col",
+                        "order": 0,
+                        "style": {
+                            "position": "absolute",
+                            "left": "420px",
+                            "top": "35px",
+                            "width": "221px",
+                            "height": "91px",
+                            "color": "rgba(218,222,232,1)"
+                        },
+                        "ref": "refcol752cf"
+                    },
+                    "hidden": false,
+                    "title": "",
+                    "isLocked": false,
+                    "condition": true,
+                    "conditionGroup": "",
+                    "children": [
+                        {
+                            "componentName": "Image",
+                            "id": "node_ocmc9x3eo11",
+                            "props": {
+                                "src": "http://163.53.168.57:9000/lowcode/1707251675134468097/1-1749895695448.png",
+                                "__component_name": "Image",
+                                "style": {
+                                    "vertical-align": "top"
+                                },
+                                "alt": "",
+                                "preview": false,
+                                "fallback": ""
+                            },
+                            "hidden": false,
+                            "title": "",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        }
+                    ]
+                },
+                {
+                    "componentName": "Col",
+                    "id": "Col533b1",
+                    "props": {
+                        "style": {
+                            "position": "absolute",
+                            "left": "673px",
+                            "top": "150px",
+                            "width": "763px",
+                            "height": "367px",
+                            "display": "flex",
+                            "flex-direction": "column",
+                            "flex-wrap": "nowrap",
+                            "justify-content": "stretch",
+                            "align-content": "flex-start",
+                            "align-items": "flex-start",
+                            "gap": "6px",
+                            "padding": "0"
+                        }
+                    },
+                    "hidden": false,
+                    "title": "",
+                    "isLocked": false,
+                    "condition": true,
+                    "conditionGroup": "",
+                    "children": [
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col09d80",
+                            "props": {
+                                "children": "Mailman is free software for managing electronic mail discussion and e-newsletter lists.Mailman is",
+                                "style": {
+                                    "color": "rgba(58,58,58,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginTop": "20px",
+                                    "align-self": "auto",
+                                    "fontSize": "11px",
+                                    "width": "auto",
+                                    "height": "14px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "22px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol09d80"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "cola90d0",
+                            "props": {
+                                "children": "inteqrated with the web,making it easy for users to manage their accounts and for list owners to",
+                                "style": {
+                                    "color": "rgba(56,56,56,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "2px",
+                                    "marginTop": "2px",
+                                    "align-self": "auto",
+                                    "fontSize": "9px",
+                                    "width": "auto",
+                                    "height": "12px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "21px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcola90d0"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "coldb071",
+                            "props": {
+                                "children": "administer their lists.Mailman supports built-in archiving, automatic bounce processing, content",
+                                "style": {
+                                    "color": "rgba(129,129,129,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginTop": "3px",
+                                    "align-self": "auto",
+                                    "fontSize": "11px",
+                                    "width": "auto",
+                                    "height": "14px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "22px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcoldb071"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "cola8b1a",
+                            "props": {
+                                "children": "filtering,digest delivery,spam filters,and more.See the features page for details",
+                                "style": {
+                                    "color": "rgba(54,54,54,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "2px",
+                                    "marginTop": "2px",
+                                    "align-self": "auto",
+                                    "fontSize": "10px",
+                                    "width": "auto",
+                                    "height": "13px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "31px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcola8b1a"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col8c3c6",
+                            "props": {
+                                "children": "Mailman is free software, distributed under the GNu General Public License,and written in the",
+                                "style": {
+                                    "color": "rgba(56,56,56,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginTop": "12px",
+                                    "align-self": "auto",
+                                    "fontSize": "11px",
+                                    "width": "auto",
+                                    "height": "14px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "21px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol8c3c6"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col974f8",
+                            "props": {
+                                "children": "Python programming language.",
+                                "style": {
+                                    "color": "rgba(130,130,130,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "2px",
+                                    "marginTop": "1px",
+                                    "align-self": "auto",
+                                    "fontSize": "13px",
+                                    "width": "auto",
+                                    "height": "17px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "32px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol974f8"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col86a2e",
+                            "props": {
+                                "children": "We want to thank our generous list of financial donors whose contributions allowed us to send a",
+                                "style": {
+                                    "color": "rgba(50,50,50,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "2px",
+                                    "marginTop": "9px",
+                                    "align-self": "auto",
+                                    "fontSize": "12px",
+                                    "width": "auto",
+                                    "height": "15px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "23px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol86a2e"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col3c526",
+                            "props": {
+                                "children": "core developer to PyCon 2015.Please consider donating to the GNu Mailman project yourself.",
+                                "style": {
+                                    "color": "rgba(51,51,51,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "2px",
+                                    "marginTop": "2px",
+                                    "align-self": "auto",
+                                    "fontSize": "11px",
+                                    "width": "auto",
+                                    "height": "14px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "20px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol3c526"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col3924a",
+                            "props": {
+                                "children": "(details)",
+                                "style": {
+                                    "color": "rgba(166,186,230,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "align-self": "auto",
+                                    "fontSize": "13px",
+                                    "width": "auto",
+                                    "height": "17px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "32px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol3924a"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "colf99af",
+                            "props": {
+                                "children": "See the Security page for important security related information, and the help page for additional",
+                                "style": {
+                                    "color": "rgba(56,56,56,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginTop": "9px",
+                                    "align-self": "auto",
+                                    "fontSize": "14px",
+                                    "width": "auto",
+                                    "height": "18px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "24px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcolf99af"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col0f563",
+                            "props": {
+                                "children": "resources for users, list and site administrators, and developers.",
+                                "style": {
+                                    "color": "rgba(123,123,123,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "2px",
+                                    "align-self": "auto",
+                                    "fontSize": "10px",
+                                    "width": "auto",
+                                    "height": "13px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "31px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol0f563"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col07709",
+                            "props": {
+                                "children": "Our wiki has lots of other great information,including a FAQ",
+                                "style": {
+                                    "color": "rgba(54,54,54,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "3px",
+                                    "marginTop": "12px",
+                                    "align-self": "auto",
+                                    "fontSize": "11px",
+                                    "width": "auto",
+                                    "height": "14px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "33px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol07709"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "colc9408",
+                            "props": {
+                                "children": "Our Code of Conduct applies to all of our modes of discussion and collaboration,including the GNU",
+                                "style": {
+                                    "color": "rgba(59,59,59,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginTop": "13px",
+                                    "align-self": "auto",
+                                    "fontSize": "11px",
+                                    "width": "auto",
+                                    "height": "14px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "20px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcolc9408"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col90ca7",
+                            "props": {
+                                "children": "Mailman mailing lists,wiki pages,and IRC channels.",
+                                "style": {
+                                    "color": "rgba(56,56,56,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "align-self": "auto",
+                                    "fontSize": "11px",
+                                    "width": "auto",
+                                    "height": "14px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "20px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol90ca7"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        }
+                    ]
+                },
+                {
+                    "componentName": "Typography.Text",
+                    "id": "colf0e1e",
+                    "props": {
+                        "children": "Current Version",
+                        "style": {
+                            "color": "rgba(54,54,54,1)",
+                            "whiteSpace": "pre-wrap",
+                            "position": "absolute",
+                            "left": "675px",
+                            "top": "546px",
+                            "fontSize": "14px",
+                            "width": "auto",
+                            "height": "19px",
+                            "backgroundColor": "rgba(255,255,255,1)",
+                            "lineHeight": "18px",
+                            "textAlign": "center",
+                            "fontWeight": 400
+                        },
+                        "__component_name": "Typography.Text",
+                        "code": false,
+                        "delete": false,
+                        "disabled": false,
+                        "mark": false,
+                        "keyboard": false,
+                        "underline": false,
+                        "strong": false,
+                        "ref": "refcolf0e1e"
+                    },
+                    "hidden": false,
+                    "title": "文字",
+                    "isLocked": false,
+                    "condition": true,
+                    "conditionGroup": ""
+                },
+                {
+                    "componentName": "Typography.Text",
+                    "id": "col5467b",
+                    "props": {
+                        "children": "Contact Us",
+                        "style": {
+                            "color": "rgba(50,50,50,1)",
+                            "whiteSpace": "pre-wrap",
+                            "position": "absolute",
+                            "left": "675px",
+                            "top": "679px",
+                            "fontSize": "14px",
+                            "width": "auto",
+                            "height": "19px",
+                            "backgroundColor": "rgba(255,255,255,1)",
+                            "lineHeight": "18px",
+                            "textAlign": "center",
+                            "fontWeight": 400
+                        },
+                        "__component_name": "Typography.Text",
+                        "code": false,
+                        "delete": false,
+                        "disabled": false,
+                        "mark": false,
+                        "keyboard": false,
+                        "underline": false,
+                        "strong": false,
+                        "ref": "refcol5467b"
+                    },
+                    "hidden": false,
+                    "title": "文字",
+                    "isLocked": false,
+                    "condition": true,
+                    "conditionGroup": ""
+                },
+                {
+                    "componentName": "Col",
+                    "id": "Colae9a1",
+                    "props": {
+                        "style": {
+                            "position": "absolute",
+                            "left": "675px",
+                            "top": "683px",
+                            "width": "759px",
+                            "height": "113px",
+                            "display": "flex",
+                            "flex-direction": "column",
+                            "flex-wrap": "nowrap",
+                            "justify-content": "stretch",
+                            "align-content": "flex-start",
+                            "align-items": "flex-start",
+                            "gap": "8px",
+                            "padding": "0"
+                        }
+                    },
+                    "hidden": false,
+                    "title": "",
+                    "isLocked": false,
+                    "condition": true,
+                    "conditionGroup": "",
+                    "children": [
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "colb2e44",
+                            "props": {
+                                "children": "There are various ways to get in touch with the GNu Mailman Steering Committee, our security",
+                                "style": {
+                                    "color": "rgba(58,58,58,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginTop": "31px",
+                                    "align-self": "auto",
+                                    "fontSize": "12px",
+                                    "width": "auto",
+                                    "height": "16px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "24px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcolb2e44"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col25273",
+                            "props": {
+                                "children": "contacts, and the Mailman developer and user communities,via IRC and email.",
+                                "style": {
+                                    "color": "rgba(128,128,128,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "align-self": "auto",
+                                    "fontSize": "10px",
+                                    "width": "auto",
+                                    "height": "13px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "43px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol25273"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        }
+                    ]
+                },
+                {
+                    "componentName": "Typography.Text",
+                    "id": "coldd076",
+                    "props": {
+                        "children": "Acknowledgements",
+                        "style": {
+                            "color": "rgba(52,52,52,1)",
+                            "whiteSpace": "pre-wrap",
+                            "position": "absolute",
+                            "left": "675px",
+                            "top": "780px",
+                            "fontSize": "16px",
+                            "width": "auto",
+                            "height": "21px",
+                            "backgroundColor": "rgba(255,255,255,1)",
+                            "lineHeight": "21px",
+                            "textAlign": "center",
+                            "fontWeight": 400
+                        },
+                        "__component_name": "Typography.Text",
+                        "code": false,
+                        "delete": false,
+                        "disabled": false,
+                        "mark": false,
+                        "keyboard": false,
+                        "underline": false,
+                        "strong": false,
+                        "ref": "refcoldd076"
+                    },
+                    "hidden": false,
+                    "title": "文字",
+                    "isLocked": false,
+                    "condition": true,
+                    "conditionGroup": ""
+                },
+                {
+                    "componentName": "Col",
+                    "id": "Colf6bc1",
+                    "props": {
+                        "style": {
+                            "position": "absolute",
+                            "left": "675px",
+                            "top": "810px",
+                            "width": "761px",
+                            "height": "82px",
+                            "display": "flex",
+                            "flex-direction": "column",
+                            "flex-wrap": "nowrap",
+                            "justify-content": "stretch",
+                            "align-content": "flex-start",
+                            "align-items": "flex-start",
+                            "gap": "5px",
+                            "padding": "0"
+                        }
+                    },
+                    "hidden": false,
+                    "title": "",
+                    "isLocked": false,
+                    "condition": true,
+                    "conditionGroup": "",
+                    "children": [
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col3f9a7",
+                            "props": {
+                                "children": "Mailmans lead developer is Abhilash Raj. Core developers are Barry Warsaw, Mark Sapiro,Aurelien",
+                                "style": {
+                                    "color": "rgba(55,55,55,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginTop": "7px",
+                                    "align-self": "auto",
+                                    "fontSize": "9px",
+                                    "width": "auto",
+                                    "height": "12px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "21px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol3f9a7"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "colf0774",
+                            "props": {
+                                "children": "BompardFlorian Fuchs,Terri Odaand Stephen.Turnbull.We thank all of our great GSoC students",
+                                "style": {
+                                    "color": "rgba(51,51,51,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginTop": "4px",
+                                    "align-self": "auto",
+                                    "fontSize": "10px",
+                                    "width": "auto",
+                                    "height": "13px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "22px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcolf0774"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col00fe4",
+                            "props": {
+                                "children": "and mentors,and the wider Mailman community for contributing to the development of GNO",
+                                "style": {
+                                    "color": "rgba(61,61,61,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginTop": "4px",
+                                    "align-self": "auto",
+                                    "fontSize": "10px",
+                                    "width": "auto",
+                                    "height": "13px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "18px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol00fe4"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col31f6b",
+                            "props": {
+                                "children": "Mailman.",
+                                "style": {
+                                    "color": "rgba(57,57,57,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "align-self": "auto",
+                                    "fontSize": "11px",
+                                    "width": "auto",
+                                    "height": "14px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "18px",
+                                    "textAlign": "left"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol31f6b"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        }
+                    ]
+                },
+                {
+                    "componentName": "Typography.Text",
+                    "id": "col3ccea",
+                    "props": {
+                        "children": "Mailman, the GNU Mailing List Manager",
+                        "style": {
+                            "color": "rgba(51,51,51,1)",
+                            "whiteSpace": "pre-wrap",
+                            "position": "absolute",
+                            "left": "676px",
+                            "top": "132px",
+                            "fontSize": "19px",
+                            "width": "auto",
+                            "height": "25px",
+                            "lineHeight": "24px",
+                            "textAlign": "center",
+                            "fontWeight": 400,
+                            "backgroundColor": "rgba(255,255,255,1)"
+                        },
+                        "__component_name": "Typography.Text",
+                        "code": false,
+                        "delete": false,
+                        "disabled": false,
+                        "mark": false,
+                        "keyboard": false,
+                        "underline": false,
+                        "strong": false,
+                        "ref": "refcol3ccea"
+                    },
+                    "hidden": false,
+                    "title": "文字",
+                    "isLocked": false,
+                    "condition": true,
+                    "conditionGroup": ""
+                },
+                {
+                    "componentName": "Col",
+                    "id": "Col5c618",
+                    "props": {
+                        "style": {
+                            "position": "absolute",
+                            "left": "678px",
+                            "top": "579px",
+                            "width": "357px",
+                            "height": "76px",
+                            "display": "flex",
+                            "flex-direction": "column",
+                            "flex-wrap": "nowrap",
+                            "justify-content": "stretch",
+                            "align-content": "flex-start",
+                            "align-items": "flex-start",
+                            "gap": "7px",
+                            "padding": "0"
+                        }
+                    },
+                    "hidden": false,
+                    "title": "",
+                    "isLocked": false,
+                    "condition": true,
+                    "conditionGroup": "",
+                    "children": [
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "colf2b21",
+                            "props": {
+                                "children": "The current stable GNUMailman versions are",
+                                "style": {
+                                    "color": "rgba(48,48,48,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginTop": "4px",
+                                    "align-self": "auto",
+                                    "fontSize": "9px",
+                                    "width": "auto",
+                                    "height": "12px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "30px",
+                                    "textAlign": "center"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcolf2b21"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "colf9c4a",
+                            "props": {
+                                "children": "28-Sep-2021 Mailman 3.3.5 Tom Sawyer",
+                                "style": {
+                                    "color": "rgba(68,68,68,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "18px",
+                                    "marginTop": "11px",
+                                    "align-self": "auto",
+                                    "fontSize": "13px",
+                                    "width": "auto",
+                                    "height": "17px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "24px",
+                                    "textAlign": "center"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcolf9c4a"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "coldafaf",
+                            "props": {
+                                "children": "13-Dec-2021Mailman2.1.39",
+                                "style": {
+                                    "color": "rgba(65,65,65,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "19px",
+                                    "align-self": "auto",
+                                    "fontSize": "10px",
+                                    "width": "auto",
+                                    "height": "13px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "24px",
+                                    "textAlign": "center"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcoldafaf"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        }
+                    ]
+                },
+                {
+                    "componentName": "Col",
+                    "id": "Col2b35c",
+                    "props": {
+                        "style": {
+                            "position": "absolute",
+                            "left": "684px",
+                            "top": "912px",
+                            "width": "746px",
+                            "height": "203px",
+                            "display": "flex",
+                            "flex-direction": "column",
+                            "flex-wrap": "nowrap",
+                            "justify-content": "flex-start",
+                            "align-content": "flex-start",
+                            "align-items": "flex-start",
+                            "gap": "5px",
+                            "padding": "0"
+                        }
+                    },
+                    "hidden": false,
+                    "title": "",
+                    "isLocked": false,
+                    "condition": true,
+                    "conditionGroup": "",
+                    "children": [
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "colb60ba",
+                            "props": {
+                                "children": "Thanks go out to:",
+                                "style": {
+                                    "color": "rgba(120,120,120,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "align-self": "auto",
+                                    "fontSize": "13px",
+                                    "width": "auto",
+                                    "height": "17px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "33px",
+                                    "textAlign": "center"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcolb60ba"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col114d6",
+                            "props": {
+                                "children": "Canonical and Zope Corporation for their past support of Barry's work while under their",
+                                "style": {
+                                    "color": "rgba(55,55,55,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "16px",
+                                    "marginTop": "11px",
+                                    "align-self": "auto",
+                                    "fontSize": "10px",
+                                    "width": "auto",
+                                    "height": "13px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "22px",
+                                    "textAlign": "center"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol114d6"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "colf3364",
+                            "props": {
+                                "children": "employ.",
+                                "style": {
+                                    "color": "rgba(97,97,97,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "30px",
+                                    "marginTop": "4px",
+                                    "align-self": "auto",
+                                    "fontSize": "12px",
+                                    "width": "auto",
+                                    "height": "16px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "21px",
+                                    "textAlign": "center"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcolf3364"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col01032",
+                            "props": {
+                                "children": "The Mail-Archive.com for their donation kickstarting the directed GNu Mailman/Free Software",
+                                "style": {
+                                    "color": "rgba(50,50,50,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "19px",
+                                    "align-self": "auto",
+                                    "fontSize": "10px",
+                                    "width": "auto",
+                                    "height": "13px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "19px",
+                                    "textAlign": "center"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol01032"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col38832",
+                            "props": {
+                                "children": "Foundation donation fund.",
+                                "style": {
+                                    "color": "rgba(115,125,176,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "28px",
+                                    "marginTop": "1px",
+                                    "align-self": "auto",
+                                    "fontSize": "13px",
+                                    "width": "auto",
+                                    "height": "17px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "25px",
+                                    "textAlign": "center"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol38832"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "col0a2b8",
+                            "props": {
+                                "children": "cPanel for their generous donation of server resources for our GitLab Cl system",
+                                "style": {
+                                    "color": "rgba(57,57,57,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "16px",
+                                    "marginTop": "3px",
+                                    "align-self": "auto",
+                                    "fontSize": "10px",
+                                    "width": "auto",
+                                    "height": "13px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "19px",
+                                    "textAlign": "center"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcol0a2b8"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "cold80fa",
+                            "props": {
+                                "children": "the list of contributors, bug hunters, big idea people, and others who have helped immensely",
+                                "style": {
+                                    "color": "rgba(49,49,49,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "11px",
+                                    "marginTop": "1px",
+                                    "align-self": "auto",
+                                    "fontSize": "13px",
+                                    "width": "auto",
+                                    "height": "17px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "24px",
+                                    "textAlign": "center"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcold80fa"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "cola9181",
+                            "props": {
+                                "children": "with Mailman's development.",
+                                "style": {
+                                    "color": "rgba(52,52,52,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "31px",
+                                    "marginTop": "2px",
+                                    "align-self": "auto",
+                                    "fontSize": "10px",
+                                    "width": "auto",
+                                    "height": "13px",
+                                    "backgroundColor": "rgba(255,255,255,1)",
+                                    "lineHeight": "24px",
+                                    "textAlign": "center"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcola9181"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        }
+                    ]
+                },
+                {
+                    "componentName": "Col",
+                    "id": "Colebb64",
+                    "props": {
+                        "style": {
+                            "position": "absolute",
+                            "left": "707px",
+                            "top": "1135px",
+                            "width": "503px",
+                            "height": "83px",
+                            "display": "flex",
+                            "flex-direction": "column",
+                            "flex-wrap": "nowrap",
+                            "justify-content": "stretch",
+                            "align-content": "flex-start",
+                            "align-items": "flex-start",
+                            "gap": "7px",
+                            "padding": "4px"
+                        }
+                    },
+                    "hidden": false,
+                    "title": "",
+                    "isLocked": false,
+                    "condition": true,
+                    "conditionGroup": "",
+                    "children": [
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "colbb7dc",
+                            "props": {
+                                "children": "Compiled using Pelican with theme Chameleon on top of Bootstrap",
+                                "style": {
+                                    "color": "rgba(66,66,66,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginTop": "8px",
+                                    "align-self": "auto",
+                                    "fontSize": "11px",
+                                    "width": "auto",
+                                    "height": "14px",
+                                    "backgroundColor": "rgba(240,240,240,1)",
+                                    "lineHeight": "21px",
+                                    "textAlign": "center"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcolbb7dc"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "colad34f",
+                            "props": {
+                                "children": "Please report bugs or suggest improvements to this site on our GitLab page",
+                                "style": {
+                                    "color": "rgba(102,102,102,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "align-self": "auto",
+                                    "fontSize": "10px",
+                                    "width": "auto",
+                                    "height": "13px",
+                                    "backgroundColor": "rgba(239,239,239,1)",
+                                    "lineHeight": "20px",
+                                    "textAlign": "center"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcolad34f"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        },
+                        {
+                            "componentName": "Typography.Text",
+                            "id": "colf4e82",
+                            "props": {
+                                "children": "This site was built from commit b'43be1f3'at b'2021-12-13 12:59:36-08o0\\n",
+                                "style": {
+                                    "color": "rgba(68,68,68,1)",
+                                    "whiteSpace": "pre-wrap",
+                                    "position": "static !important",
+                                    "flex-shrink": 0,
+                                    "marginLeft": "4px",
+                                    "align-self": "auto",
+                                    "fontSize": "10px",
+                                    "width": "auto",
+                                    "height": "13px",
+                                    "backgroundColor": "rgba(240,240,240,1)",
+                                    "lineHeight": "20px",
+                                    "textAlign": "center"
+                                },
+                                "__component_name": "Typography.Text",
+                                "code": false,
+                                "delete": false,
+                                "disabled": false,
+                                "mark": false,
+                                "keyboard": false,
+                                "underline": false,
+                                "strong": false,
+                                "ref": "refcolf4e82"
+                            },
+                            "hidden": false,
+                            "title": "文字",
+                            "isLocked": false,
+                            "condition": true,
+                            "conditionGroup": ""
+                        }
+                    ]
+                },
+                {
+                    "componentName": "Menu",
+                    "id": "col78914",
+                    "props": {
+                        "__component_name": "Menu",
+                        "defaultOpenKeys": [],
+                        "defaultSelectedKeys": [],
+                        "forceSubMenuRender": false,
+                        "inlineCollapsed": false,
+                        "inlineIndent": 0,
+                        "mode": "horizontal",
+                        "multiple": false,
+                        "openKeys": [],
+                        "selectabl": false,
+                        "selectable": true,
+                        "subMenuCloseDelay": 0,
+                        "subMenuOpenDelay": 0,
+                        "theme": "light",
+                        "triggerSubMenuAction": "hover",
+                        "items": [
+                            {
+                                "key": "itemk-0",
+                                "label": "Home"
+                            },
+                            {
+                                "key": "itemk-1",
+                                "label": "Wiki/FAQs"
+                            },
+                            {
+                                "key": "itemk-2",
+                                "label": "Documentation-"
+                            },
+                            {
+                                "key": "itemk-3",
+                                "label": "Source Code"
+                            },
+                            {
+                                "key": "itemk-4",
+                                "label": "Donate"
+                            }
+                        ],
+                        "selectedKeys": [
+                            "itemk-0"
+                        ],
+                        "style": {
+                            "position": "absolute",
+                            "left": "900px",
+                            "top": "9px",
+                            "borderRadius": "1px",
+                            "width": "599px",
+                            "height": "115px",
+                            "color": "rgba(131,158,192,1)",
+                            "display": "flex",
+                            "align-items": "center"
+                        },
+                        "ref": "refcol78914"
+                    },
+                    "hidden": false,
+                    "title": "",
+                    "isLocked": false,
+                    "condition": true,
+                    "conditionGroup": ""
+                }
+            ]
+        }
+    ],
+    "i18n": {}
+}
