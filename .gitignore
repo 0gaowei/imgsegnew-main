@@ -6,7 +6,12 @@ __pycache__/
 *.pyo
 *.pyd
 .cursor
+
 img_seg/api.out
 img_seg/gradio.out
+img_seg/model/
+img_seg/trainInfo/
 
 sam_pth/
+
+env/

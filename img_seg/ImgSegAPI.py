@@ -53,7 +53,14 @@ from train import train, val
 from paddleocr import PaddleOCR, draw_ocr
 
 import re
-app = FastAPI()
+tags_metadata = [
+    {"name": "ResNet", "description": "ResNet 相关：模型推理与训练接口"},
+    {"name": "SAM", "description": "SAM 相关：图像分割与交互式提示分割接口"},
+    {"name": "OCR", "description": "文字识别与文本信息提取接口"},
+    {"name": "Training", "description": "模型训练控制与进度查询"},
+    {"name": "Analysis", "description": "图像分析类接口（颜色、圆角、边框等）"},
+]
+app = FastAPI(openapi_tags=tags_metadata)
 
 
 
@@ -76,12 +83,16 @@ if not os.path.exists(data_path):
 # 初始化ocr模型
 # reader = easyocr.Reader(['ch_sim', 'en'])
 reader = PaddleOCR(use_angle_cls=False, lang="ch")
+# sam_checkpoint = r"../sam_pth/sam_vit_h_4b8939.pth"
+# model_type = "vit_h"
 # sam_checkpoint = r"../sam_pth/sam_vit_b_01ec64.pth"
 # model_type = "vit_b"
 
 # 加载sam模型
-sam_checkpoint = r"../sam_pth/sam_vit_h_4b8939.pth"
-model_type = "vit_h"
+# sam_checkpoint = r"../sam_pth/sam_vit_h_4b8939.pth"
+# model_type = "vit_h"
+sam_checkpoint = r"../sam_pth/sam_vit_b_01ec64.pth"
+model_type = "vit_b"
 device = "cuda"
 sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
 sam.to(device=device)
@@ -483,7 +494,7 @@ def predictSam(image_url, input_point, input_label, input_box, is_predict_type, 
                 if time.time()-start_time > 150:   # 超过150s按超时异常处理
                     flag = True
                     break
-                if meminfo.free/1024**3 > 10:   # 空余显存大于10G则分配
+                if meminfo.free/1024**3 > 2:   # 空余显存大于2G则分配 (降低要求以适配轻量模型)
                     try:
                         predictor.set_image(image)
                     except RuntimeError as e:
@@ -736,7 +747,7 @@ def auto_mask_generator(image):
             if end_time - start_time > 150:  # 超过150s按超时异常处理
                 flag = True
                 break
-            if meminfo.free / 1024 ** 3 > 20:  # 空余显存大于20G则分配
+            if meminfo.free / 1024 ** 3 > 1:  # 空余显存大于1G则分配 (进一步降低要求)
                 try:
                     masks = mask_generator.generate(image)
                 except RuntimeError as e:
@@ -768,7 +779,7 @@ def predict_mask(image, input_point, input_label, input_box):
             if time.time() - start_time > 150:  # 超过150s按超时异常处理
                 flag = True
                 break
-            if meminfo.free / 1024 ** 3 > 10:  # 空余显存大于10G则分配
+            if meminfo.free / 1024 ** 3 > 2:  # 空余显存大于2G则分配 (降低要求以适配轻量模型)
                 try:
                     predictor.set_image(image)
                 except RuntimeError as e:
@@ -992,8 +1003,8 @@ def points2Box(points):
     return box
 
 
-
-@app.post(Url.PREDICT_RESNET)
+# ResNet推理接口/imgSeg/v1/predictResnet
+@app.post(Url.PREDICT_RESNET, tags=["ResNet"], summary="ResNet 推理", description="输入图片 URL 列表，预测组件类型并返回统计结果")
 def predictResnetStart(item: ResnetStartItem):
     image_url_list = item.image_url_list
     topic_id = item.topic_id
@@ -1030,11 +1041,7 @@ def predictResnetStart(item: ResnetStartItem):
     }
 
 
-
-
-
-
-@app.post(Url.PREDICT_SAM)
+@app.post(Url.PREDICT_SAM, tags=["SAM"], summary="SAM 推理（自动/提示）", description="对图片执行 SAM 分割，支持空提示（自动分割）或通过点/框提示进行分割")
 def predictSamStart(item: SamStartItem):
     print("********************************************************************************************")
     print("进入samstart接口时间",datetime.now())
@@ -1118,7 +1125,7 @@ def predictSamStart(item: SamStartItem):
         }
 
 
-@app.post(Url.PREDICT_SAM_2)
+@app.post(Url.PREDICT_SAM_2, tags=["SAM"], summary="SAM 分割（带筛选框）", description="在选择框内进行自动分割并过滤文字框与子组件，返回父子层级信息")
 def predictSamStart2(item: SamStartItem2):
     print("********************************************************************************************")
     print(datetime.now())
@@ -1205,7 +1212,7 @@ def predictSamStart2(item: SamStartItem2):
         }
 
 
-@app.post(Url.PREDICT_SAM_3)
+@app.post(Url.PREDICT_SAM_3, tags=["SAM"], summary="SAM 分割（点集）", description="通过点集合生成包围框并基于提示点进行分割，支持返回轮廓图")
 def predictSamStart3(item: SamStartItem3):
     print("********************************************************************************************")
     print(datetime.now())
@@ -1369,7 +1376,7 @@ def training(epochs, batch_size, lr, train_task_id):
 
 
 # 训练任务开始api
-@app.post(Url.resnetTrainStart)
+@app.post(Url.resnetTrainStart, tags=["Training"], summary="开始 ResNet 训练", description="提交 ResNet 训练任务到后台并返回训练任务 ID")
 def trainStart(background_tasks: BackgroundTasks, input: TrainStartItem):
     # 获取参数
     epochs = input.train_params['epochs']
@@ -1428,7 +1435,7 @@ def trainStart(background_tasks: BackgroundTasks, input: TrainStartItem):
 
 
 # 训练信息查询api
-@app.post(Url.resnetTrainProgress)
+@app.post(Url.resnetTrainProgress, tags=["Training"], summary="训练进度查询", description="查询指定训练任务的当前状态、轮次及验证指标")
 def statusInfo(input: TrainProcessSkipItem):
     train_task_id = input.train_task_id
     user_id = input.user_id
@@ -1534,7 +1541,7 @@ def statusInfo(input: TrainProcessSkipItem):
 
 
 # 训练任务终止api
-@app.post(Url.resnetTrainSkip)
+@app.post(Url.resnetTrainSkip, tags=["Training"], summary="终止训练任务", description="用户请求终止指定训练任务，并更新任务状态为已终止")
 def stopTrain(input: TrainProcessSkipItem):
     train_task_id = input.train_task_id
     user_id = input.user_id
@@ -1658,7 +1665,7 @@ def getDataset(dataset: dict):
     return getinfo, count
 
 
-@app.post(Url.getTrainData)
+@app.post(Url.getTrainData, tags=["Training"], summary="上传训练数据", description="根据传入数据集配置从外部 URL 下载并保存训练图片，返回每条记录的处理状态")
 def getTrainData(item: GetTrainData):
     user_id = item.user_id
     dataset = item.dataset
@@ -1688,7 +1695,7 @@ def getTrainData(item: GetTrainData):
     return get_data_response
 
 
-@app.post(Url.predictText)
+@app.post(Url.predictText, tags=["OCR"], summary="文本识别", description="对图片列表执行 OCR 并返回文字内容及行高/对齐信息")
 def predictText(item: PredictTextInput):
     text = {}
     for image_url in item.image_url_list:
@@ -2083,7 +2090,7 @@ def get_radio_coord_width_height_content_list(reader, image):
     return group_radio_info_list
 
 
-@app.post(Url.GET_RADIO_TEXT_INFO)
+@app.post(Url.GET_RADIO_TEXT_INFO, tags=["OCR"], summary="获取单选/多选文本信息", description="识别并返回单选/多选组中每个选项的坐标、宽高与文本内容")
 def getRadioCoordWidthHeightContentList(item: PredictTextInput):
     radio_text_info = {}
     for image_url in item.image_url_list:
@@ -2180,7 +2187,7 @@ def get_table_header_info(reader, image):
 
 
 
-@app.post(Url.GET_TABLE_HEADER_INFO)
+@app.post(Url.GET_TABLE_HEADER_INFO, tags=["OCR"], summary="表头识别", description="识别表格表头字段位置、宽高与颜色信息")
 def getTableHeaderInfo(item: PredictTextInput):
     table_header_text_info = {}
     # 是否排序和是否有单、复选框
@@ -2361,7 +2368,7 @@ def get_avg_border_color(image):
     return rgb_list
 
 
-@app.post(Url.GET_BORDER_COLOR_AND_ROUND_HEIGHT)
+@app.post(Url.GET_BORDER_COLOR_AND_ROUND_HEIGHT, tags=["Analysis"], summary="边框颜色与圆角检测", description="返回图片中最大轮廓的边框颜色以及是否存在圆角及圆角高度")
 def getBorderColorAndRoundHeight(item: PredictTextInput):
     border_color = {}
     round_corner_flag_and_height = {}
@@ -2393,7 +2400,7 @@ def getBorderColorAndRoundHeight(item: PredictTextInput):
     }
 
 
-@app.post(Url.GET_COMPONENT_COLOR)
+@app.post(Url.GET_COMPONENT_COLOR, tags=["Analysis"], summary="组件与背景颜色", description="识别组件主色与整体背景颜色，返回二者 RGB 值")
 def getComponentColor(item: PredictTextInput):
     component_color = {}
     background_color = {}
