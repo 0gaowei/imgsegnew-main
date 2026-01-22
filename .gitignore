@@ -5,3 +5,8 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+.cursor
+img_seg/api.out
+img_seg/gradio.out
+
+sam_pth/
