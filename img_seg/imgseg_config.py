@@ -194,7 +194,7 @@ class Message:
 CUDA_VISIBLE_DEVICES = "0"
 
 # resnet默认推理模型
-DEFAULT_RESNET_MODEL_ID = "Train-imgSeg-af46e11c-d99f-4a3e-8c80-33fe17aa2716"
+DEFAULT_RESNET_MODEL_ID = "Train-imgSeg-52ddfff5-6e6e-4e83-955a-94783d83613a"
 
 
 TRAIN_INFO = 'trainInfo'     # resnet训练状态信息存放的文件夹名称

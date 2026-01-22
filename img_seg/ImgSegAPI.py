@@ -3,6 +3,7 @@ import argparse
 import queue
 
 from imgseg_config import *
+from models import *
 parser = argparse.ArgumentParser()
 parser.add_argument('--device', default=CUDA_VISIBLE_DEVICES, type=str)
 parser.add_argument('--port', default=Url.port, type=int)
@@ -30,7 +31,6 @@ import requests
 import uvicorn
 
 from fastapi import Response, FastAPI
-from pydantic import BaseModel
 from typing import Optional
 from PIL import Image
 from io import BytesIO
@@ -105,65 +105,6 @@ trainLock = threading.Lock()
 # 用来限制同一时间只有一个训练任务的Flag全局变量
 is_train = False
 
-
-# 开始ResNet推理接口输入类
-class ResnetStartItem(BaseModel):
-    image_url_list: list
-    model_id: Optional[str] = DEFAULT_RESNET_MODEL_ID
-    topic_id: str
-    user_id: str
-    input_component_type: Optional[str] = ""
-
-
-# 开始SAM推理输入类
-class SamStartItem(BaseModel):
-    image_url: str
-    prompt = {
-        "input_point": [],
-        "input_label": [],
-        "input_box": []
-    }
-    topic_id: str
-    user_id: str
-    is_predict_type: Optional[bool] = False
-    resnet_model_id: Optional[str] = DEFAULT_RESNET_MODEL_ID
-    read_text_component_list: Optional[list] = []
-    cut_outline_flag: Optional[bool] = False
-
-# 开始SAM推理输入类
-class SamStartItem2(BaseModel):
-    image_url: str
-    prompt = {
-        "input_point": [],
-        "input_label": [],
-    }
-    select_box: Optional[list] = []
-    topic_id: str
-    user_id: str
-    is_predict_type: Optional[bool] = False
-    resnet_model_id: Optional[str] = DEFAULT_RESNET_MODEL_ID
-    read_text_component_list: Optional[list] = []
-    cut_outline_flag: Optional[bool] = False
-
-class SamStartItem3(BaseModel):
-    image_url: str
-    points: list
-    prompt = {
-        "input_point": [],
-        "input_label": [],
-        #"input_box": []
-    }
-    topic_id: str
-    user_id: str
-    is_predict_type: Optional[bool] = False
-    resnet_model_id: Optional[str] = DEFAULT_RESNET_MODEL_ID
-    read_text_component_list: Optional[list] = []
-
-# （SAM和ResNet）推理状态查询和终止的输入类
-class ProcessSKipItem(BaseModel):
-    task_id: str
-    topic_id: str
-    user_id: str
 
 
 # 根据uuid4获取唯一的task_id
@@ -1351,25 +1292,6 @@ def predictSamStart3(item: SamStartItem3):
 
 
 
-
-
-# 训练部分
-class TrainStartItem(BaseModel):
-    user_id: str
-    task_type: Optional[str] = "train"
-    train_params = {
-        "epochs": 10,
-        "batch_size": 8,
-        "learning_rate": 0.001
-    }
-
-
-class TrainProcessSkipItem(BaseModel):
-    train_task_id: str
-    user_id: str
-    task_type: Optional[str] = "train"
-
-
 def training(epochs, batch_size, lr, train_task_id):
     train_task_path = os.path.join(train_info_dir_path,train_task_id)
     # 根据输入的数据集获取类别数
@@ -1701,12 +1623,6 @@ def singleVal(url: str, component_type: str):
         return ValidStatus.BOTH_COMPLIANT               # 合规数据
 
 
-# 获得训练数据接口
-class GetTrainData(BaseModel):
-    user_id: Optional[str] = "admin"
-    dataset: dict
-
-
 # 读取数据并保存
 def getDataset(dataset: dict):
     getinfo = {}
@@ -1770,11 +1686,6 @@ def getTrainData(item: GetTrainData):
             }
         }
     return get_data_response
-
-
-class PredictTextInput(BaseModel):
-    user_id: Optional[str] = "admin"
-    image_url_list: list
 
 
 @app.post(Url.predictText)
