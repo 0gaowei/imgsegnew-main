@@ -19,6 +19,7 @@ import base64
 import json
 from collections import Counter
 import io
+import shutil
 import threading
 import time
 import gc
@@ -30,7 +31,8 @@ import torchvision.transforms as transforms
 import requests
 import uvicorn
 
-from fastapi import Response, FastAPI
+from fastapi import Response, FastAPI, File, UploadFile, HTTPException
+from fastapi.responses import FileResponse
 from typing import Optional
 from PIL import Image
 from io import BytesIO
@@ -59,6 +61,7 @@ tags_metadata = [
     {"name": "OCR", "description": "文字识别与文本信息提取接口"},
     {"name": "Training", "description": "模型训练控制与进度查询"},
     {"name": "Analysis", "description": "图像分析类接口（颜色、圆角、边框等）"},
+    {"name": "Ingest", "description": "入料并识别（同步MVP）"},
 ]
 app = FastAPI(openapi_tags=tags_metadata)
 
@@ -71,8 +74,14 @@ rootpath = os.path.dirname(os.path.abspath(__file__))
 train_info_dir_path = os.path.join(rootpath, TRAIN_INFO)       # resnet训练状态信息所产生文件的存放路径
 model_dir_path = os.path.join(rootpath, RESNET_MODEL)        # resnet训练产生的模型的存放路径
 data_path = os.path.join(rootpath, RESNET_DATA)        # resnet训练数据集存放路径
+ingest_info_dir_path = os.path.join(rootpath, INGEST_INFO)
+uploads_dir = os.path.join(rootpath, UPLOADS_DIR)
 
 
+if not os.path.exists(ingest_info_dir_path):
+    os.mkdir(ingest_info_dir_path)
+if not os.path.exists(uploads_dir):
+    os.mkdir(uploads_dir)
 if not os.path.exists(train_info_dir_path):
     os.mkdir(train_info_dir_path)
 if not os.path.exists(model_dir_path):
@@ -141,6 +150,135 @@ def url_update(original_string):
     # new_string = new_string.replace("/minio", "")
     new_string = new_string.replace("https", "http")
     return new_string
+# Serve uploaded files
+@app.get("/uploads/{filename}", tags=["Ingest"], summary="获取上传的文件", description="获取上传的文件")
+def serve_upload(filename: str):
+    path = os.path.join(uploads_dir, filename)
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="file not found")
+    return FileResponse(path)
+
+
+def save_upload_file(upload_file: UploadFile, dest_path: str):
+    try:
+        with open(dest_path, "wb") as buffer:
+            shutil.copyfileobj(upload_file.file, buffer)
+    finally:
+        upload_file.file.close()
+
+
+@app.post(Url.INGEST, tags=["Ingest"], summary="入料并识别（同步MVP）", description="上传图片后执行SAM+ResNet，返回 componentsMap 与 componentsTree")
+def ingest(image: UploadFile = File(None), image_url: Optional[str] = None, user_id: Optional[str] = "anonymous"):
+    """
+    MVP synchronous ingest: accept uploaded file or image_url.
+    Returns componentsMap and componentsTree on success.
+    """
+    if image is None and not image_url:
+        return {
+            "code": ResponseCode.REQUEST_PARAMS_NOT_MATCH,
+            "status": StatusCode.BAD_REQUEST,
+            "message": Message.FAILURE,
+            "payload": {"err": ErrorCode.INVALID_PARAMETER}
+        }
+    task_id = get_task_id("ingest_")
+    task_path = os.path.join(ingest_info_dir_path, task_id)
+    # initialize task file
+    content = {"task_id": task_id, "task_status": TaskStatus.IN_PROGRESS, "created_at": str(datetime.now())}
+    with open(f"{task_path}.json", "w", encoding="utf-8") as f:
+        json.dump(content, f, ensure_ascii=False, indent=4)
+
+    # determine URL to process
+    if image is not None:
+        # save upload
+        ext = os.path.splitext(image.filename)[1] or ".png"
+        filename = f"{task_id}{ext}"
+        dest = os.path.join(uploads_dir, filename)
+        save_upload_file(image, dest)
+        # construct local URL that get_image can fetch
+        proc_url = f"http://127.0.0.1:{args.port}/uploads/{filename}"
+    else:
+        proc_url = image_url
+
+    try:
+        # call predictSam (no prompt)
+        component_info = predictSam(proc_url, [], [], [], True, DEFAULT_RESNET_MODEL_ID, [], False)
+        if component_info == ErrorCode.READ_URL_FAIL:
+            content["task_status"] = TaskStatus.ABNORMAL_TERMINATION
+            content["err"] = ErrorCode.READ_URL_FAIL
+            with open(f"{task_path}.json", "w", encoding="utf-8") as f:
+                json.dump(content, f, ensure_ascii=False, indent=4)
+            return {
+                "code": ResponseCode.SUCCESS_GENERAL,
+                "status": StatusCode.OK,
+                "message": Message.SUCCESS,
+                "payload": {"err": ErrorCode.READ_URL_FAIL, "task_id": task_id}
+            }
+        if component_info == ErrorCode.TIMEOUT:
+            content["task_status"] = TaskStatus.ABNORMAL_TERMINATION
+            content["err"] = ErrorCode.TIMEOUT
+            with open(f"{task_path}.json", "w", encoding="utf-8") as f:
+                json.dump(content, f, ensure_ascii=False, indent=4)
+            return {
+                "code": ResponseCode.SUCCESS_GENERAL,
+                "status": StatusCode.OK,
+                "message": Message.SUCCESS,
+                "payload": {"err": ErrorCode.TIMEOUT, "task_id": task_id}
+            }
+
+        # convert to lowcode schema
+        from lowcode_schema import component_info_to_map_and_tree
+        components_map, components_tree, page_meta = component_info_to_map_and_tree(component_info)
+
+        # save result
+        content["task_status"] = TaskStatus.NORMAL_END
+        content["result"] = {"components_map": components_map, "components_tree": components_tree, "page_meta": page_meta}
+        content["finished_at"] = str(datetime.now())
+        with open(f"{task_path}.json", "w", encoding="utf-8") as f:
+            json.dump(content, f, ensure_ascii=False, indent=4)
+
+        return {
+            "code": ResponseCode.SUCCESS_GENERAL,
+            "status": StatusCode.OK,
+            "message": Message.SUCCESS,
+            "payload": {
+                "task_id": task_id,
+                "task_status": TaskStatus.NORMAL_END,
+                "components_map": components_map,
+                "components_tree": components_tree,
+                "page_meta": page_meta
+            }
+        }
+    except Exception as e:
+        content["task_status"] = TaskStatus.ABNORMAL_TERMINATION
+        content["err"] = str(e)
+        with open(f"{task_path}.json", "w", encoding="utf-8") as f:
+            json.dump(content, f, ensure_ascii=False, indent=4)
+        return {
+            "code": ResponseCode.REQUEST_PARAMS_NOT_MATCH,
+            "status": StatusCode.INTERNAL_SERVER_ERROR,
+            "message": Message.FAILURE,
+            "payload": {"err": ErrorCode.UNKNOWN_EXCEPTION, "msg": str(e)}
+        }
+
+
+@app.get(Url.INGEST_STATUS, tags=["Ingest"], summary="查询 ingest 任务状态", description="查询 ingest 任务状态")
+def ingest_status(task_id: str):
+    task_path = os.path.join(ingest_info_dir_path, task_id)
+    if not os.path.exists(f"{task_path}.json"):
+        return {
+            "code": ResponseCode.REQUEST_PARAMS_NOT_MATCH,
+            "status": StatusCode.NOT_FOUND,
+            "message": Message.FAILURE,
+            "payload": {"err": ErrorCode.TASK_ID_NOT_FOUND}
+        }
+    with open(f"{task_path}.json", "r", encoding="utf-8") as f:
+        content = json.load(f)
+    return {
+        "code": ResponseCode.SUCCESS_GENERAL,
+        "status": StatusCode.OK,
+        "message": Message.SUCCESS,
+        "payload": content
+    }
 # 获取url上的图像,如果出现异常将异常返回
 def get_image(url):
     url = url_update(url)

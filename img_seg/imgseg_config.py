@@ -35,6 +35,11 @@ class Url:
     GET_FORM_INPUT_INFO = "/imgSeg/v1/getFormInputInfo"
     GET_BORDER_COLOR_AND_ROUND_HEIGHT = "/imgSeg/v1/getBorderColorAndRoundHeight"
     GET_COMPONENT_COLOR = "/imgSeg/v1/getComponentColor"
+    
+    # ingest
+    INGEST = "/imgSeg/v1/ingest"
+    INGEST_STATUS = "/imgSeg/v1/ingest/status"
+    INGEST_RESULT = "/imgSeg/v1/ingest/result"
 
 # return中的“code”
 class ResponseCode:
@@ -200,6 +205,8 @@ DEFAULT_RESNET_MODEL_ID = "Train-imgSeg-52ddfff5-6e6e-4e83-955a-94783d83613a"
 TRAIN_INFO = 'trainInfo'     # resnet训练状态信息存放的文件夹名称
 RESNET_MODEL = 'model'     # resnet模型存放的文件夹名称
 RESNET_DATA = 'data'      # resnet训练数据集存放的文件夹名称
+INGEST_INFO = 'ingestInfo'     # ingest 任务信息存放的文件夹名称
+UPLOADS_DIR = 'uploads'        # 上传文件存放目录
 
 
 # 需要识别颜色的组件类型list
