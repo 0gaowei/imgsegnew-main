@@ -1,7 +1,7 @@
 import os
 import argparse
 import queue
-
+from logger import Logger
 from imgseg_config import *
 from models import *
 parser = argparse.ArgumentParser()
@@ -55,6 +55,7 @@ from train import train, val
 from paddleocr import PaddleOCR, draw_ocr
 
 import re
+logger = Logger().get_logger()
 tags_metadata = [
     {"name": "ResNet", "description": "ResNet 相关：模型推理与训练接口"},
     {"name": "SAM", "description": "SAM 相关：图像分割与交互式提示分割接口"},
@@ -91,7 +92,9 @@ if not os.path.exists(data_path):
 
 # 初始化ocr模型
 # reader = easyocr.Reader(['ch_sim', 'en'])
+logger.info(f"开始初始化ocr模型")
 reader = PaddleOCR(use_angle_cls=False, lang="ch")
+logger.info(f"ocr模型初始化完成\n")
 # sam_checkpoint = r"../sam_pth/sam_vit_h_4b8939.pth"
 # model_type = "vit_h"
 # sam_checkpoint = r"../sam_pth/sam_vit_b_01ec64.pth"
@@ -100,6 +103,7 @@ reader = PaddleOCR(use_angle_cls=False, lang="ch")
 # 加载sam模型
 # sam_checkpoint = r"../sam_pth/sam_vit_h_4b8939.pth"
 # model_type = "vit_h"
+logger.info(f"开始初始化sam模型")
 sam_checkpoint = r"../sam_pth/sam_vit_b_01ec64.pth"
 model_type = "vit_b"
 device = "cuda"
@@ -107,7 +111,7 @@ sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
 sam.to(device=device)
 mask_generator = SamAutomaticMaskGenerator(sam)
 predictor = SamPredictor(sam)
-
+logger.info(f"sam模型初始化完成\n")
 # 加载resnet默认模型
 default_model_path = os.path.join(model_dir_path, DEFAULT_RESNET_MODEL_ID)
 default_checkpoint = torch.load(default_model_path + '.pth')
@@ -137,7 +141,7 @@ def url_update(original_string):
     pattern = r"(?<=://)(.*?)/minio"
     pattern1 = r"(?<=://)(.*?)/lowcode"
     new_string = ''
-    print(original_string)
+    logger.info(f"original_string:{original_string}\n")
     if "43.247.90.34" in original_string.lower():
         new_string = re.sub(pattern, "10.100.14.77:9000", original_string)
         new_string = re.sub(pattern1, "10.100.14.77:9000/lowcode", original_string)
@@ -173,6 +177,7 @@ def ingest(image: UploadFile = File(None), image_url: Optional[str] = None, user
     MVP synchronous ingest: accept uploaded file or image_url.
     Returns componentsMap and componentsTree on success.
     """
+    logger.info(f"入料并识别开始: {image_url}")
     if image is None and not image_url:
         return {
             "code": ResponseCode.REQUEST_PARAMS_NOT_MATCH,
@@ -181,6 +186,7 @@ def ingest(image: UploadFile = File(None), image_url: Optional[str] = None, user
             "payload": {"err": ErrorCode.INVALID_PARAMETER}
         }
     task_id = get_task_id("ingest_")
+    logger.info(f"task_id:{task_id}")
     task_path = os.path.join(ingest_info_dir_path, task_id)
     # initialize task file
     content = {"task_id": task_id, "task_status": TaskStatus.IN_PROGRESS, "created_at": str(datetime.now())}
@@ -200,9 +206,27 @@ def ingest(image: UploadFile = File(None), image_url: Optional[str] = None, user
         proc_url = image_url
 
     try:
-        # call predictSam (no prompt)
-        component_info = predictSam(proc_url, [], [], [], True, DEFAULT_RESNET_MODEL_ID, [], False)
+        temp_image = get_image(proc_url)
+        if isinstance(temp_image, Exception):
+            raise Exception("无法读取图片")
+        img_width, img_height = temp_image.size
+        del temp_image
+
+        # 使用整个图片作为筛选框，调用 predictSam2 获取嵌套结构
+        select_box = [0, 0, img_width, img_height]
+        component_info = predictSam2(
+            image_url=proc_url,
+            input_point=[],
+            input_label=[],  # input_point, input_label (empty for auto segmentation)
+            select_box=select_box,
+            is_predict_type=True,  # is_predict_type - 识别组件类型
+            resnet_model_id=DEFAULT_RESNET_MODEL_ID,
+            read_text_component_list=["Input", "Button", "Select", "Radio.Group", "Table", "DatePicker", "TimePicker"],  # read_text_component_list
+            cut_outline_flag=False  # cut_outline_flag
+        )
         if component_info == ErrorCode.READ_URL_FAIL:
+            logger.error(f"predictSam2接口读取url图像数据失败: {proc_url};\n \
+                        \t\t错误原因: {component_info}\n")
             content["task_status"] = TaskStatus.ABNORMAL_TERMINATION
             content["err"] = ErrorCode.READ_URL_FAIL
             with open(f"{task_path}.json", "w", encoding="utf-8") as f:
@@ -213,7 +237,9 @@ def ingest(image: UploadFile = File(None), image_url: Optional[str] = None, user
                 "message": Message.SUCCESS,
                 "payload": {"err": ErrorCode.READ_URL_FAIL, "task_id": task_id}
             }
-        if component_info == ErrorCode.TIMEOUT:
+        elif component_info == ErrorCode.TIMEOUT:
+            logger.error(f"predictSam2接口超时: {proc_url};\n \
+                        \t\t错误原因: {component_info}\n")
             content["task_status"] = TaskStatus.ABNORMAL_TERMINATION
             content["err"] = ErrorCode.TIMEOUT
             with open(f"{task_path}.json", "w", encoding="utf-8") as f:
@@ -224,35 +250,46 @@ def ingest(image: UploadFile = File(None), image_url: Optional[str] = None, user
                 "message": Message.SUCCESS,
                 "payload": {"err": ErrorCode.TIMEOUT, "task_id": task_id}
             }
+        else:
+            # convert to lowcode schema
+            from lowcode_schema import component_info_to_map_and_tree, build_full_schema
+            components_map, components_tree, page_meta = component_info_to_map_and_tree(component_info)
 
-        # convert to lowcode schema
-        from lowcode_schema import component_info_to_map_and_tree
-        components_map, components_tree, page_meta = component_info_to_map_and_tree(component_info)
+            # 构建完整 schema
+            full_schema = build_full_schema(components_map, components_tree, page_meta)
 
-        # save result
-        content["task_status"] = TaskStatus.NORMAL_END
-        content["result"] = {"components_map": components_map, "components_tree": components_tree, "page_meta": page_meta}
-        content["finished_at"] = str(datetime.now())
-        with open(f"{task_path}.json", "w", encoding="utf-8") as f:
-            json.dump(content, f, ensure_ascii=False, indent=4)
-
-        return {
-            "code": ResponseCode.SUCCESS_GENERAL,
-            "status": StatusCode.OK,
-            "message": Message.SUCCESS,
-            "payload": {
-                "task_id": task_id,
-                "task_status": TaskStatus.NORMAL_END,
+            # save result
+            content["task_status"] = TaskStatus.NORMAL_END
+            content["result"] = {
                 "components_map": components_map,
                 "components_tree": components_tree,
-                "page_meta": page_meta
+                "page_meta": page_meta,
+                "full_schema": full_schema
             }
-        }
+            content["finished_at"] = str(datetime.now())
+            with open(f"{task_path}.json", "w", encoding="utf-8") as f:
+                json.dump(content, f, ensure_ascii=False, indent=4)
+            logger.info(f"入料并识别成功: {proc_url}\n")
+            return {
+                "code": ResponseCode.SUCCESS_GENERAL,
+                "status": StatusCode.OK,
+                "message": Message.SUCCESS,
+                "payload": {
+                    "task_id": task_id,
+                    "task_status": TaskStatus.NORMAL_END,
+                    "components_map": components_map,
+                    "components_tree": components_tree,
+                    "page_meta": page_meta,
+                    "full_schema": full_schema
+                }
+            }
     except Exception as e:
         content["task_status"] = TaskStatus.ABNORMAL_TERMINATION
         content["err"] = str(e)
         with open(f"{task_path}.json", "w", encoding="utf-8") as f:
             json.dump(content, f, ensure_ascii=False, indent=4)
+        logger.error(f"入料并识别异常: {proc_url};\n \
+                        \t\t错误原因: {e}\n")
         return {
             "code": ResponseCode.REQUEST_PARAMS_NOT_MATCH,
             "status": StatusCode.INTERNAL_SERVER_ERROR,
@@ -288,14 +325,13 @@ def get_image(url):
         if response.status_code == 200:
             image = Image.open(BytesIO(response.content))
             response.close()
-            print(f"{url}图片已成功读取")
-            print(f"读取图片已完成，时间:",datetime.now())
+            logger.info(f"图片已成功读取: {url}\n")
             return image
         else:
-            print(f"无法获取{url}图片内容")
+            logger.warning(f"无法获取图片内容: {url}\n")
             raise Exception(f"无法获取{url}图片内容，response状态码: {response.status_code}")
     except Exception as e:
-        print(f"读取过程出错，错误原因：{e}")
+        logger.error(f"读取过程出错，错误原因：{e}\n")
         return e
 def get_image_numpy(url):
     url = url_update(url)
@@ -308,13 +344,12 @@ def get_image_numpy(url):
 
         # 使用OpenCV解码图像
         image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
-        print(f"{url}图片已成功读取")
-        print(f"读取图片已完成，时间:", datetime.now())
+        logger.info(f"{url}图片已成功读取\n")
         # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         response.close()
         return image
     except Exception as e:
-        print(f"读取过程出错，错误原因：: {e}")
+        logger.error(f"读取过程出错，错误原因：: {e}\n")
         return e
 
 
@@ -574,7 +609,15 @@ def predictResnet(image_url_list, modelId, input_component_type):
     return component_type, predict_result, image_num
 
 # SAM推理函数
-def predictSam(image_url, input_point, input_label, input_box, is_predict_type, resnet_model_id, read_text_component_list, cut_outline_flag):
+def predictSam(
+    image_url,
+    input_point,
+    input_label,
+    input_box,
+    is_predict_type,
+    resnet_model_id,
+    read_text_component_list,
+    cut_outline_flag):
 
     image = get_image(image_url)
     # 如果读取图片过程出现了异常
@@ -586,7 +629,9 @@ def predictSam(image_url, input_point, input_label, input_box, is_predict_type, 
     # 没有提示调用SamAutomaticMaskGenerator类直接对图像进行分割生成多个掩码
     if len(input_point) == 0 and len(input_box) == 0:
         # mask_generator = SamAutomaticMaskGenerator(sam)
+        logger.info(f"开始自动分割生成多个掩码: {image_url}\n")
         masks = auto_mask_generator(image)
+        logger.info(f"自动分割生成多个掩码完成: {image_url}\n")
         # 产生掩码过程发生了异常，（超时或爆显存）
         if masks is True:
             torch.cuda.empty_cache()
@@ -618,6 +663,12 @@ def predictSam(image_url, input_point, input_label, input_box, is_predict_type, 
             values.append([[min_row, min_col], width, height, mean_color[0:3], img_base64])
         del masks
         component_info = [dict(zip(keys, value)) for value in values]
+        # 根据 is_predict_type 判断是否识别组件类型
+        if is_predict_type:
+            component_info = get_component_info(component_info, resnet_model_id, read_text_component_list, 1)
+        else:
+            for info in component_info:
+                info['component_type'] = 'Image'
 
     # 有提示 调用SamPredictor类预先对图像进行分割预测
     else:
@@ -631,6 +682,7 @@ def predictSam(image_url, input_point, input_label, input_box, is_predict_type, 
                 meminfo = pynvml.nvmlDeviceGetMemoryInfo(handle)
                 if time.time()-start_time > 150:   # 超过150s按超时异常处理
                     flag = True
+                    logger.error(f"获取选择框内的分割掩码超时\n")
                     break
                 if meminfo.free/1024**3 > 2:   # 空余显存大于2G则分配 (降低要求以适配轻量模型)
                     try:
@@ -731,14 +783,15 @@ def predictSam(image_url, input_point, input_label, input_box, is_predict_type, 
                     info['component_type'] = 'Image'
     gc.collect()
     torch.cuda.empty_cache()
-    print("结束predictsam接口时间",datetime.now())
+    logger.info(f"结束predictsam接口时间:{datetime.now()}\n")
     return component_info
 
 
 # 根据resnet预测的不同组件类型调用对应的组件信息获取函数
 def get_component_info(new_image_info_list, resnet_model_id, read_text_component_list, sam_predict_id):
-    # 确定resnet模型
-    if resnet_model_id != DEFAULT_RESNET_MODEL_ID:
+    logger.info(f"开始获取组件信息")
+    # 确定resnet模型（None、空字符串或与默认模型ID不同时使用默认模型）
+    if resnet_model_id and resnet_model_id != DEFAULT_RESNET_MODEL_ID:
         with resnetLock:
             model_path = os.path.join(model_dir_path, resnet_model_id)
             checkpoint = torch.load(model_path + '.pth')
@@ -767,18 +820,28 @@ def get_component_info(new_image_info_list, resnet_model_id, read_text_component
         #     # 表单信息
         #     image_info['formMsg'] = formMsg
         if component_type in read_text_component_list:
-            textResult = get_text_info(reader, component_image)
-            # 获取文字行高和对齐方向
-            textResult = get_line_height(textResult)
-            image_info['text'] = textResult
+            try:
+                textResult = get_text_info(reader, component_image)
+                # 获取文字行高和对齐方向
+                textResult = get_line_height(textResult)
+                image_info['text'] = textResult
+            except Exception as e:
+                logger.error(f"OCR识别失败 (Button/Input): {e}\n")
+                image_info['text'] = []
         if component_type == "Radio.Group":
-            textResult = get_radio_coord_width_height_content_list(reader, component_image)
-            image_info['text'] = textResult
+            try:
+                textResult = get_radio_coord_width_height_content_list(reader, component_image)
+                image_info['text'] = textResult
+            except Exception as e:
+                logger.error(f"OCR识别失败 (Radio.Group): {e}\n")
+                image_info['text'] = []
         if component_type == "Table":
-            textResult = get_table_header_info(reader, component_image)
-            # other_info = get_table_other_info(reader, component_image)
-            image_info['table_header_info'] = textResult
-            # image_info['table_header_other_info'] = other_info
+            try:
+                textResult = get_table_header_info(reader, component_image)
+                image_info['table_header_info'] = textResult
+            except Exception as e:
+                logger.error(f"OCR识别失败 (Table): {e}\n")
+                image_info['table_header_info'] = []
         # 识别组件列表：开关、滑块等颜色
         if component_type in NEED_COLOR_COMPONENT:
             colorResult = get_component_color(component_image)
@@ -800,26 +863,39 @@ def get_component_info(new_image_info_list, resnet_model_id, read_text_component
             image_info['direction'] = direction
         # 识别日期选择器的文本块信息和选择类型
         if component_type == "DatePicker":
-            textResult = get_text_info(reader, component_image)
-            image_info['text'] = textResult
-            # 判断是否是日期区间
-            date_interval_flag = get_is_date_picker(textResult)
-            image_info['isPicker'] = date_interval_flag
-            # 判断区间的模式 年、季度、月、周、日
-            mode = get_datepicker_mode(textResult)
-            image_info['mode'] = mode
+            try:
+                textResult = get_text_info(reader, component_image)
+                image_info['text'] = textResult
+                # 判断是否是日期区间
+                date_interval_flag = get_is_date_picker(textResult)
+                image_info['isPicker'] = date_interval_flag
+                # 判断区间的模式 年、季度、月、周、日
+                mode = get_datepicker_mode(textResult)
+                image_info['mode'] = mode
+            except Exception as e:
+                logger.error(f"OCR识别失败 (DatePicker): {e}\n")
+                image_info['text'] = []
+                image_info['isPicker'] = False
+                image_info['mode'] = ""
         if component_type == "TimePicker":
-            textResult = get_text_info(reader, component_image)
-            image_info['text'] = textResult
-            # 判断是否时间范围选择器
-            time_range_flag = get_is_time_picker(textResult)
-            image_info['isPicker'] = time_range_flag
+            try:
+                textResult = get_text_info(reader, component_image)
+                image_info['text'] = textResult
+                # 判断是否时间范围选择器
+                time_range_flag = get_is_time_picker(textResult)
+                image_info['isPicker'] = time_range_flag
+            except Exception as e:
+                logger.error(f"OCR识别失败 (TimePicker): {e}\n")
+                image_info['text'] = []
+                image_info['isPicker'] = False
+    logger.info(f"完成获取组件信息\n")
     return new_image_info_list
 
 
 
 # 保留筛选框中的文字框图片并获得文字框里的文字信息（内容、颜色、坐标）
 def get_crop_text_image(content_coord_width_height_list, image_numpy, box):
+    logger.info(f"开始过滤掉筛选框中的掩码图片和文字框图片")
     filter_coord_width_height_list = []
     box_left_top_x, box_left_top_y, box_right_bottom_x, box_right_bottom_y = box
     keys = ['left_top_coord', 'width', 'height', 'rgb_mean', 'img_component_base64', 'text', 'component_type']
@@ -869,11 +945,13 @@ def get_crop_text_image(content_coord_width_height_list, image_numpy, box):
             values.append([[image_left_top_x, image_left_top_y], width, height, mean_color[0:3], img_base64, text_result, "Text"])
             filter_coord_width_height_list.append(content_coord_width_height[:3])
     crop_text_image_list = [dict(zip(keys, value)) for value in values]
+    logger.info(f"完成过滤掉筛选框中的掩码图片和文字框图片\n")
     return crop_text_image_list, filter_coord_width_height_list
 
 
 def auto_mask_generator(image):
     # mask_generator = SamAutomaticMaskGenerator(sam)
+    logger.info(f"开始获取选择框内的分割掩码")
     with samLock:  # mask_generator.generate(image)需要分配显存，上线程锁以防资源竞争导致爆显存
         pynvml.nvmlInit()
         handle = pynvml.nvmlDeviceGetHandleByIndex(int(args.device))  # 指定显卡号
@@ -883,13 +961,14 @@ def auto_mask_generator(image):
             meminfo = pynvml.nvmlDeviceGetMemoryInfo(handle)
             end_time = time.time()
             if end_time - start_time > 150:  # 超过150s按超时异常处理
+                logger.error(f"获取选择框内的分割掩码超时\n")
                 flag = True
                 break
             if meminfo.free / 1024 ** 3 > 1:  # 空余显存大于1G则分配 (进一步降低要求)
                 try:
                     masks = mask_generator.generate(image)
                 except RuntimeError as e:
-                    print(f"显存不够分配:{e}")
+                    logger.error(f"显存不够分配:{e}\n")
                     flag = True
                     del masks
                 finally:
@@ -899,11 +978,15 @@ def auto_mask_generator(image):
         torch.cuda.empty_cache()
         gc.collect()
         return flag
+    torch.cuda.empty_cache()
+    gc.collect()
+    logger.info(f"获取选择框内的分割掩码完成\n")
     return masks
 
 
 # 对提示点生成一个掩码、筛选框作为提示框生成一个掩码作为父节点
 def predict_mask(image, input_point, input_label, input_box):
+    logger.info(f"开始对提示点生成一个掩码、筛选框作为提示框生成一个掩码作为父节点")
     # predictor = SamPredictor(sam)
     box_mask = None
     point_mask = None
@@ -916,12 +999,13 @@ def predict_mask(image, input_point, input_label, input_box):
             meminfo = pynvml.nvmlDeviceGetMemoryInfo(handle)
             if time.time() - start_time > 150:  # 超过150s按超时异常处理
                 flag = True
+                logger.error(f"对提示点生成一个掩码、筛选框作为提示框生成一个掩码作为父节点超时\n")
                 break
             if meminfo.free / 1024 ** 3 > 2:  # 空余显存大于2G则分配 (降低要求以适配轻量模型)
                 try:
                     predictor.set_image(image)
                 except RuntimeError as e:
-                    # print(f"显存不够分配", {e})
+                    logger.error(f"显存不够分配: {e}\n")
                     flag = True
                 finally:
                     break
@@ -947,11 +1031,15 @@ def predict_mask(image, input_point, input_label, input_box):
             box=input_box,
             multimask_output=False,
         )
+    torch.cuda.empty_cache()
+    gc.collect()
+    logger.info(f"完成对提示点生成一个掩码、筛选框作为提示框生成一个掩码作为父节点\n")
     return box_mask, point_mask
 
 
 # 对自动分割出的掩码进行处理，筛选掉选择框外的掩码图片和文字框内的掩码图片
 def processMasks(image, masks, select_box, filter_coord_width_height_list):
+    logger.info(f"开始对自动分割出的掩码进行处理，筛选掉选择框外的掩码图片和文字框内的掩码图片")
     box_left_top_x, box_left_top_y, box_right_bottom_x, box_right_bottom_y = select_box
     keys = ['left_top_coord', 'width', 'height', 'rgb_mean', 'img_component_base64']
     values = []
@@ -995,6 +1083,7 @@ def processMasks(image, masks, select_box, filter_coord_width_height_list):
         img_base64 = base64.b64encode(img_byte).decode('utf-8')
         values.append([[min_row, min_col], width, height, mean_color[0:3], img_base64])
     crop_image_info_list = [dict(zip(keys, value)) for value in values]
+    logger.info(f"完成对自动分割出的掩码进行处理，筛选掉选择框外的掩码图片和文字框内的掩码图片\n")
     return crop_image_info_list
 
 
@@ -1043,10 +1132,12 @@ def filter_crop_image(image_info, prompt_image_info):
 
 # 求相对于筛选框的坐标
 def coord_to_select_box(father_left_top_coord, new_image_info_list):
+    logger.info(f"开始求相对于筛选框的坐标")
     x = father_left_top_coord[0]
     y = father_left_top_coord[1]
     for image_info in new_image_info_list:
         image_info['left_top_coord'] = [image_info['left_top_coord'][0]-x, image_info['left_top_coord'][1]-y]
+    logger.info(f"完成求相对于筛选框的坐标\n")
     return new_image_info_list
 
 
@@ -1075,7 +1166,7 @@ def predictSam2(image_url, input_point, input_label, select_box, is_predict_type
     # 获取输入图片中所有文字框的内容、左上角坐标与宽高组成的信息列表
     content_coord_width_height_list = get_text_content(reader, image)
     # 输入图片中有文字框
-    if not(content_coord_width_height_list is None):
+    if content_coord_width_height_list:
         # 过滤掉筛选框中的掩码图片和文字框图片
         crop_text_image_list, filter_coord_width_height_list = get_crop_text_image(content_coord_width_height_list, image, select_box)
         # 过滤文字框中的掩码得到掩码图片信息
@@ -1088,6 +1179,7 @@ def predictSam2(image_url, input_point, input_label, select_box, is_predict_type
         image_info_list = processMasks(image, masks, select_box, [])
     # 如果有提示点和筛选框
     if len(input_point) > 0:
+        logger.info(f"开始预测掩码: {image_url}\n")
         box_mask, point_mask = predict_mask(image, input_point, input_label, select_box)
         # 说明返回的是flag发生了异常
         if point_mask is True:
@@ -1095,7 +1187,7 @@ def predictSam2(image_url, input_point, input_label, select_box, is_predict_type
             return ErrorCode.TIMEOUT
         box_prompt_image_info = processMask(image, box_mask[0])
         point_prompt_image_info = processMask(image, point_mask[0], cut_outline_flag)
-        #
+        logger.info(f"预测掩码完成: {image_url}\n")
         new_image_info_list = [image_info for image_info in image_info_list if
                                filter_crop_image(image_info, point_prompt_image_info)]
     # 只有筛选框没有提示点
@@ -1111,7 +1203,6 @@ def predictSam2(image_url, input_point, input_label, select_box, is_predict_type
     new_image_info_list = point_prompt_image_info + new_image_info_list
     if is_predict_type:
         new_image_info_list = get_component_info(new_image_info_list, resnet_model_id, read_text_component_list, 2)
-
     father_image_info = box_prompt_image_info[:]
     # 更新子节点相对于父节点的左上角坐标
     new_image_info_list = coord_to_select_box(father_image_info[0]['left_top_coord'], new_image_info_list)
@@ -1181,10 +1272,7 @@ def predictResnetStart(item: ResnetStartItem):
 
 @app.post(Url.PREDICT_SAM, tags=["SAM"], summary="SAM 推理（自动/提示）", description="对图片执行 SAM 分割，支持空提示（自动分割）或通过点/框提示进行分割")
 def predictSamStart(item: SamStartItem):
-    print("********************************************************************************************")
-    print("进入samstart接口时间",datetime.now())
-    print("samStart接口接收前端数据：", item)
-    print("********************************************************************************************")
+    logger.info(f"samStart接口接收前端数据：{item}\n")
     image_url = item.image_url
     topic_id = item.topic_id
     user_id = item.user_id
@@ -1218,9 +1306,7 @@ def predictSamStart(item: SamStartItem):
             }
         }
     task_id = get_task_id("samPredict_")
-    print("***************")
-    print(f"task_id:{task_id}")
-    print("***************")
+    logger.info(f"task_id:{task_id}\n")
     component_info = predictSam(image_url, input_point, input_label, input_box,item.is_predict_type, item.resnet_model_id, item.read_text_component_list, item.cut_outline_flag)
     if component_info == ErrorCode.READ_URL_FAIL:
         return {
@@ -1265,10 +1351,7 @@ def predictSamStart(item: SamStartItem):
 
 @app.post(Url.PREDICT_SAM_2, tags=["SAM"], summary="SAM 分割（带筛选框）", description="在选择框内进行自动分割并过滤文字框与子组件，返回父子层级信息")
 def predictSamStart2(item: SamStartItem2):
-    print("********************************************************************************************")
-    print(datetime.now())
-    print("samStart2接口接收前端数据：", item)
-    print("********************************************************************************************")
+    logger.info(f"samStart2接口接收前端数据：{item}")
     image_url = item.image_url
     topic_id = item.topic_id
     user_id = item.user_id
@@ -1278,6 +1361,7 @@ def predictSamStart2(item: SamStartItem2):
 
     # 判断输入的prompt格式是否正确
     if not samPromptVerify(input_point, input_label, [], select_box):
+        logger.error(f"输入prompt数据格式有误: {item.prompt}\n")
         return {
             "code": ResponseCode.REQUEST_PARAMS_NOT_MATCH,
             "status": StatusCode.BAD_REQUEST,
@@ -1293,6 +1377,7 @@ def predictSamStart2(item: SamStartItem2):
     modelIdList = os.listdir(model_dir_path)
     # 检查前端传入的resnet模型ID是否存在，不存在返回错误信息
     if str(item.resnet_model_id) + ".pth" not in modelIdList:
+        logger.error(f"模型id输入错误（不存在）: {item.resnet_model_id}\n")
         return {
             "code": ResponseCode.REQUEST_PARAMS_NOT_MATCH,
             "status": StatusCode.BAD_REQUEST,
@@ -1305,11 +1390,20 @@ def predictSamStart2(item: SamStartItem2):
         }
 
     task_id = get_task_id("samPredict_")
-    print("***************")
-    print(f"task_id:{task_id}")
-    print("***************")
-    component_info = predictSam2(image_url, input_point, input_label, select_box, item.is_predict_type, item.resnet_model_id, item.read_text_component_list, item.cut_outline_flag)
+    logger.info(f"task_id:{task_id}")
+    component_info = predictSam2(
+        image_url,
+        input_point,
+        input_label,
+        select_box,
+        item.is_predict_type,
+        item.resnet_model_id,
+        item.read_text_component_list,
+        item.cut_outline_flag
+    )
     if component_info == ErrorCode.READ_URL_FAIL:
+        logger.error(f"predictSam2接口读取url图像数据失败: {image_url};\n \
+                        \t\t错误原因: {component_info}\n")
         return {
             "code": ResponseCode.SUCCESS_GENERAL,
             "status": StatusCode.OK,
@@ -1323,6 +1417,7 @@ def predictSamStart2(item: SamStartItem2):
             }
         }
     elif component_info == ErrorCode.TIMEOUT:
+        logger.error(f"predictSam2接口超时: {image_url};错误原因: {component_info}\n")
         return {
             "code": ResponseCode.SUCCESS_GENERAL,
             "status": StatusCode.OK,
@@ -1336,6 +1431,7 @@ def predictSamStart2(item: SamStartItem2):
             }
         }
     else:
+        logger.info(f"predictSam2接口成功: {image_url}\n")
         return {
             "code": ResponseCode.SUCCESS_GENERAL,
             "status": StatusCode.OK,
@@ -1352,10 +1448,7 @@ def predictSamStart2(item: SamStartItem2):
 
 @app.post(Url.PREDICT_SAM_3, tags=["SAM"], summary="SAM 分割（点集）", description="通过点集合生成包围框并基于提示点进行分割，支持返回轮廓图")
 def predictSamStart3(item: SamStartItem3):
-    print("********************************************************************************************")
-    print(datetime.now())
-    print("samStart3接口接收前端数据：", item)
-    print("********************************************************************************************")
+    logger.info(f"samStart3接口接收前端数据：{item}\n")
     image_url = item.image_url
     topic_id = item.topic_id
     user_id = item.user_id
@@ -1391,9 +1484,7 @@ def predictSamStart3(item: SamStartItem3):
             }
         }
     task_id = get_task_id("samPredict_")
-    print("***************")
-    print(f"task_id:{task_id}")
-    print("***************")
+    logger.info(f"task_id:{task_id}\n")
     component_info = predictSam(image_url, input_point, input_label, input_box,item.is_predict_type, item.resnet_model_id, item.read_text_component_list, True)
     if component_info == ErrorCode.READ_URL_FAIL:
         return {
@@ -1467,7 +1558,7 @@ def training(epochs, batch_size, lr, train_task_id):
                            num_workers=Train.num_workers)
     # 开始训练
     for epoch in range(1, epochs + 1):
-        print("-----------------")
+        logger.info(f"开始训练第{epoch}轮\n")
         trainAcc = train(epoch, trainLoader, model, criterion, optimizer)
         valAcc, singleAcc, valLoss = val(epoch, valLoader, model, criterion, labels)
         with open(f"{train_task_path}.json", "r", encoding='utf-8') as f:
@@ -1502,7 +1593,7 @@ def training(epochs, batch_size, lr, train_task_id):
             }
                 , model_path)
     # 标记模型正常结束训练
-    print("训练结束")
+    logger.info(f"训练第{epoch}轮结束\n")
     with open(f"{train_task_path}.json", "r", encoding='utf-8') as f:
         read_json = json.load(f)
     read_json['task_status'] = TaskStatus.NORMAL_END
@@ -1660,7 +1751,7 @@ def statusInfo(input: TrainProcessSkipItem):
                 }
             }
     except Exception as err:
-        print(err)
+        logger.error(f"训练进度查询失败，错误原因：{err}\n")
         status_response_data = {
             "code": ResponseCode.REQUEST_PARAMS_NOT_MATCH,
             "status": StatusCode.NOT_FOUND,
@@ -1722,7 +1813,7 @@ def stopTrain(input: TrainProcessSkipItem):
             }
         }
     except Exception as err:
-        print(err)
+        logger.error(f"终止训练任务失败，错误原因：{err}\n")
         status_response_data = {
             "code": ResponseCode.REQUEST_PARAMS_NOT_MATCH,
             "status": StatusCode.NOT_FOUND,
@@ -1982,6 +2073,7 @@ def get_text_info(reader, image):
 # 获取文字的内容及区域信息
 def get_text_content(reader, image_numpy):
     # 给图片加上宽为20像素的边框 增加ocr识别的准确率
+    logger.info(f"开始给图片加上宽为20像素的边框")
     add_border_image_numpy = add_border(image_numpy)
     with ocrLock:
         # results = reader.readtext(image_numpy)
@@ -2023,6 +2115,7 @@ def get_text_content(reader, image_numpy):
             if left_top_coords[1] + height > image_height:
                 height = image_height - left_top_coords[1]
             coord_width_height_content_list.append((left_top_coords, width, height, text_content))
+        logger.info(f"完成给图片加上宽为20像素的边框\n")
         return coord_width_height_content_list
     else:
         return None

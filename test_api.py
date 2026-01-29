@@ -55,15 +55,15 @@ def test_sam1_predict():
     data = {
         "image_url": "https://img.zcool.cn/community/0181445f0194b9a801215aa00b682d.png?x-oss-process=image/auto-orient,1/resize,m_lfit,w_1280,limit_1/sharpen,100",
         "prompt": {
-            "input_point": [[800, 750]],
-            "input_label": [1],
+            "input_point": [],
+            "input_label": [],
             "input_box": []
         },
         "topic_id": "test123",
         "user_id": "user_test_01",
         "is_predict_type": True,
         "resnet_model_id": "Train-imgSeg-52ddfff5-6e6e-4e83-955a-94783d83613a",
-        "read_text_component_list": ["Button"]
+        "read_text_component_list": ["Button", "Input"]
     }
 
     print("\n测试SAM推理接口...")
@@ -218,15 +218,16 @@ def test_train_stop():
 def test_sam2_predict():
     url = "http://localhost:9002/imgSeg/v1/predictSam2"
     data = {
-        "image_url": "https://img.zcool.cn/community/0181445f0194b9a801215aa00b682d.png?x-oss-process=image/auto-orient,1/resize,m_lfit,w_640,limit_1/sharpen,100",
-        "select_box": [995, 341, 1662, 719],
+        "image_url": "https://img.zcool.cn/community/0181445f0194b9a801215aa00b682d.png?x-oss-process=image/auto-orient,1/resize,m_lfit,w_1280,limit_1/sharpen,100",
+        "select_box": [350, 500, 630, 830],
         "prompt": {
-            "input_point": [[800, 750]],
-            "input_label": [1]
+            "input_point": [],
+            "input_label": []
         },
         "topic_id": "test123",
         "user_id": "user_test_01",
-        "resnet_model_id": "Train-imgSeg-52ddfff5-6e6e-4e83-955a-94783d83613a"
+        "resnet_model_id": "Train-imgSeg-52ddfff5-6e6e-4e83-955a-94783d83613a",
+        "is_predict_type": True
     }
 
     print("\n测试SAM自动分割接口...")
@@ -282,5 +283,5 @@ if __name__ == "__main__":
     # test_train_start()     # 已测试 ✓
     # test_train_progress()  # 已测试 ✓
     # test_train_stop()      # 已测试 ✓
-    test_ingest()        # 已测试 ✓
-    # test_sam2_predict()  # 测试超时
+    # test_ingest()        # 已测试 ✓
+    test_sam2_predict()  # 测试超时
